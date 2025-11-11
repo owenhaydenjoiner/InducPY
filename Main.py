@@ -1,0 +1,9 @@
+from fontTools.ttx import process
+
+import InducPY,InducPY_materiels
+
+
+Test_part = InducPY.part(0.155,0.05757,0,InducPY_materiels.Inconel_718)
+Coil = InducPY.coil(120,InducPY_materiels.Copper_C1000,120)
+Process = InducPY.heating_process(Test_part,Coil,20,1200)
+print(Process.required_power())
