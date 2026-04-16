@@ -1,6 +1,6 @@
 from fontTools.ttx import process
 
-import InducPY,InducPY_materiels
+import InducPY,InducPY_materials
 
 
 Test_part = InducPY.Part(0.155, 0.05757, 0, InducPY_materiels.Inconel_718)

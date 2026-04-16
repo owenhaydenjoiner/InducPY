@@ -10,11 +10,11 @@ A Python module for modelling induction heating processes, calculating required 
 
 ## Classes
 
-### `Materiel`
+### `Material`
 
 Represents a material with physical properties relevant to induction heating.
 
-**Constructor:** `Materiel(relative_mag_permability, resistance, specific_heat, density)`
+**Constructor:** `Material(relative_mag_permability, resistance, specific_heat, density)`
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -38,14 +38,14 @@ Represents a material with physical properties relevant to induction heating.
 
 Represents a hollow cylindrical part to be heated.
 
-**Constructor:** `Part(height, OD, ID, materiel)`
+**Constructor:** `Part(height, OD, ID, material)`
 
 | Parameter | Type | Description |
 |---|---|---|
 | `height` | `float` | Height of the part (m) |
 | `OD` | `float` | Outer diameter (m) |
 | `ID` | `float` | Inner diameter (m) |
-| `materiel` | `Materiel` | Material of the part |
+| `material` | `Material` | Material of the part |
 
 **Attributes:**
 
@@ -60,12 +60,12 @@ Represents a hollow cylindrical part to be heated.
 
 Represents the induction coil used to heat the part.
 
-**Constructor:** `Coil(ID, materiel, frequency)`
+**Constructor:** `Coil(ID, material, frequency)`
 
 | Parameter | Type | Description |
 |---|---|---|
 | `ID` | `float` | Inner diameter of the coil (m) |
-| `materiel` | `Materiel` | Material the coil is made from |
+| `material` | `Material` | Material the coil is made from |
 | `frequency` | `float` | Operating frequency of the coil (Hz) |
 
 ---
@@ -94,14 +94,46 @@ Internally computes:
 - **`delta_part`** — Skin depth of the part (m):
 $$\delta_{part} = \frac{1}{\sqrt{\pi \cdot f \cdot \mu_{part} / \rho_{part}}}$$
 
+  | Symbol | Description | Unit |
+  |---|---|---|
+  | $\delta_{part}$ | Electromagnetic skin depth of the part — the depth at which induced current density falls to ~37% of its surface value | m |
+  | $f$ | Coil operating frequency (`Coil.frequency`) | Hz |
+  | $\mu_{part}$ | Absolute magnetic permeability of the part (`Part.material.mag_permability`) | H/m |
+  | $\rho_{part}$ | Electrical resistivity of the part (`Part.material.resistance`) | Ω·m |
+
 - **`delta_coil`** — Skin depth of the coil (m):
 $$\delta_{coil} = \frac{1}{\sqrt{\pi \cdot f \cdot \mu_{coil} / \rho_{coil}}}$$
+
+  | Symbol | Description | Unit |
+  |---|---|---|
+  | $\delta_{coil}$ | Electromagnetic skin depth of the coil | m |
+  | $f$ | Coil operating frequency (`Coil.frequency`) | Hz |
+  | $\mu_{coil}$ | Absolute magnetic permeability of the coil (`Coil.material.mag_permability`) | H/m |
+  | $\rho_{coil}$ | Electrical resistivity of the coil (`Coil.material.resistance`) | Ω·m |
 
 - **`elec_efficiency`** — Electrical coupling efficiency (dimensionless):
 $$\eta = \frac{1}{1 + \frac{(ID_{coil} + \delta_{coil}) \cdot \rho_{coil} \cdot \delta_{coil}}{(OD_{part} - \delta_{part}) \cdot \rho_{part} \cdot \delta_{part}}}$$
 
+  | Symbol | Description | Unit |
+  |---|---|---|
+  | $\eta$ | Electrical coupling efficiency — fraction of coil power transferred to the part | dimensionless |
+  | $ID_{coil}$ | Inner diameter of the coil (`Coil.ID`) | m |
+  | $\delta_{coil}$ | Skin depth of the coil (from above) | m |
+  | $\rho_{coil}$ | Electrical resistivity of the coil (`Coil.material.resistance`) | Ω·m |
+  | $OD_{part}$ | Outer diameter of the part (`Part.OD`) | m |
+  | $\delta_{part}$ | Skin depth of the part (from above) | m |
+  | $\rho_{part}$ | Electrical resistivity of the part (`Part.material.resistance`) | Ω·m |
+
 - **Required power:**
 $$P = m \cdot c_p \cdot \Delta T \cdot \eta$$
+
+  | Symbol | Description | Unit |
+  |---|---|---|
+  | $P$ | Required power to heat the part | W |
+  | $m$ | Mass of the part (`Part.mass`) | kg |
+  | $c_p$ | Specific heat capacity of the part (`Part.material.specific_heat`) | J/kg·K |
+  | $\Delta T$ | Temperature rise required (`target_temp − start_temp`) | K or °C |
+  | $\eta$ | Electrical coupling efficiency (from above) | dimensionless |
 
 ---
 
@@ -109,17 +141,17 @@ $$P = m \cdot c_p \cdot \Delta T \cdot \eta$$
 
 ```python
 import numpy as np
-from heating import Materiel, Part, Coil, Heating_process
+from heating import Material, Part, Coil, Heating_process
 
 # Define materials
-steel = Materiel(
+steel = Material(
     relative_mag_permability=100,
     resistance=1.6e-7,
     specific_heat=490,
     density=7850
 )
 
-copper = Materiel(
+copper = Material(
     relative_mag_permability=1,
     resistance=1.68e-8,
     specific_heat=385,
@@ -127,10 +159,10 @@ copper = Materiel(
 )
 
 # Create part (hollow steel cylinder)
-part = Part(height=0.05, OD=0.06, ID=0.04, materiel=steel)
+part = Part(height=0.05, OD=0.06, ID=0.04, material=steel)
 
 # Create coil (copper coil at 10 kHz)
-coil = Coil(ID=0.07, materiel=copper, frequency=10000)
+coil = Coil(ID=0.07, material=copper, frequency=10000)
 
 # Define heating process (room temp to 800°C)
 process = Heating_process(part=part, coil=coil, start_temp=25, target_temp=800)
@@ -146,5 +178,3 @@ print(f"Required Power: {power:.2f} W")
 
 - All dimensions should be in **SI units** (metres, kg, etc.).
 - The volume calculation uses only the cross-sectional annular area — ensure `height` is accounted for if a full volumetric calculation is needed.
-- The `Materiel` class name is a non-standard spelling of "Material" — take care when referencing it.
-- `Part.Materiel` is referenced with a capital `M` inside `Heating_process`, so ensure the attribute is accessed consistently.
