@@ -6,7 +6,7 @@ class Part:
         self.OD = OD
         self.ID = ID
         self.Material = Material
-        self.volume = 0.25*np.pi*((self.OD**2)-(self.ID**2))
+        self.volume = 0.25*np.pi*((self.OD**2)-(self.ID**2)) *height
         self.mass = self.volume*self.Material.density
 
 
@@ -38,4 +38,4 @@ class Heating_process:
         self.elec_effecincy = 1 / (1 + ((self.Coil.ID + self.delta_coil) * self.Coil.Material.resistance * self.delta_coil) / ((self.Part.OD - self.delta_part) * self.Part.Material.resistance * self.delta_part))
         return  self.Part.mass*self.Part.Material.specific_heat*self.delta_T*self.elec_effecincy
 
-
+    def calc_procces(self,desired_heat_flux,)
