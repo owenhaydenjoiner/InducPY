@@ -91,8 +91,8 @@ Calculates the power (W) required to heat the part to the target temperature.
 
 Internally computes:
 
-- **`delta_part`** — Skin depth of the part (m):
-$$\delta_{part} = \frac{1}{\sqrt{\pi \cdot f \cdot \mu_{part} / \rho_{part}}}$$
+- **`delta_part`** — Skin depth of the part (m) [[1]](#ref-1) :
+$$\delta_{part} \approx \frac{1}{\sqrt{\pi \cdot f \cdot \mu_{part} / \rho_{part}}}$$
 
   | Symbol | Description | Unit |
   |---|---|---|
@@ -101,8 +101,8 @@ $$\delta_{part} = \frac{1}{\sqrt{\pi \cdot f \cdot \mu_{part} / \rho_{part}}}$$
   | $\mu_{part}$ | Absolute magnetic permeability of the part (`Part.material.mag_permability`) | H/m |
   | $\rho_{part}$ | Electrical resistivity of the part (`Part.material.resistance`) | Ω·m |
 
-- **`delta_coil`** — Skin depth of the coil (m):
-$$\delta_{coil} = \frac{1}{\sqrt{\pi \cdot f \cdot \mu_{coil} / \rho_{coil}}}$$
+- **`delta_coil`** — Skin depth of the coil (m) [[1]](#ref-1):
+$$\delta_{coil} \approx \frac{1}{\sqrt{\pi \cdot f \cdot \mu_{coil} / \rho_{coil}}}$$
 
   | Symbol | Description | Unit |
   |---|---|---|
@@ -111,7 +111,7 @@ $$\delta_{coil} = \frac{1}{\sqrt{\pi \cdot f \cdot \mu_{coil} / \rho_{coil}}}$$
   | $\mu_{coil}$ | Absolute magnetic permeability of the coil (`Coil.material.mag_permability`) | H/m |
   | $\rho_{coil}$ | Electrical resistivity of the coil (`Coil.material.resistance`) | Ω·m |
 
-- **`elec_efficiency`** — Electrical coupling efficiency (dimensionless):
+- **`elec_efficiency`** — Electrical coupling efficiency (dimensionless) [[2]](#ref-2): 
 $$\eta = \frac{1}{1 + \frac{(ID_{coil} + \delta_{coil}) \cdot \rho_{coil} \cdot \delta_{coil}}{(OD_{part} - \delta_{part}) \cdot \rho_{part} \cdot \delta_{part}}}$$
 
   | Symbol | Description | Unit |
@@ -177,4 +177,10 @@ print(f"Required Power: {power:.2f} W")
 ## Notes
 
 - All dimensions should be in **SI units** (metres, kg, etc.).
-- The volume calculation uses only the cross-sectional annular area — ensure `height` is accounted for if a full volumetric calculation is needed.
+
+
+## References
+<a id="ref-1"></a>
+[1]Iowa State University Center for Nondestructive Evaluation, "Depth of Penetration and Current Density," *NDE-Ed.org: Physics of Nondestructive Evaluation*, [https://www.nde-ed.org/Physics/Electricity/depthcurrentdensity.xhtml](https://www.nde-ed.org/Physics/Electricity/depthcurrentdensity.xhtml) (accessed April 2026)
+<a id="ref-2"></a>
+[2] Rudnev, V. and Totten, G.E. (Eds.), *ASM Handbook, Volume 4C: Induction Heating and Heat Treatment*, ASM International, Materials Park, OH, 2014. DOI: [10.31399/asm.hb.v04c.9781627081672](https://doi.org/10.31399/asm.hb.v04c.9781627081672)
