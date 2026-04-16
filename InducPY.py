@@ -3,7 +3,7 @@ import numpy as np
 class Part:
     def __init__(self, height, OD, ID, Material):
         self.height = height
-        self.OD = Oa
+        self.OD = OD
         self.ID = ID
         self.Material = Material
         self.volume = 0.25*np.pi*((self.OD**2)-(self.ID**2))
